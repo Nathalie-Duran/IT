@@ -255,10 +255,7 @@ rename table user to data_user;
 
 
 
-
-
-
-
+rename table user to data_user;
 
 
 #Aparece un error debido al usuario 9999 que no aparece en la tabla data_user
@@ -267,15 +264,10 @@ ADD CONSTRAINT fk_user_transaction
 FOREIGN KEY (user_id)
 REFERENCES data_user(id);
 
-
-
 #Comprovación
 SELECT user_id 
 FROM transaction
 WHERE user_id NOT IN (SELECT id FROM data_user);
-
-
-
 
 
 
@@ -287,22 +279,7 @@ DELETE FROM transaction
 WHERE user_id NOT IN (SELECT id FROM data_user);
 
 
-
-
-
-
-
-
-
-
-
-
 alter table transaction add constraint fk_data_user_id foreign key (user_id) references data_user(id);
-
-
-
-
-
 
 
 #Modificación de las tablas para adaptarse al modelo del ejercicio
@@ -314,6 +291,34 @@ alter table transactions.data_user change email personal_email varchar(150);
 
 
 
+##Tabla data_user: 
+#Invertir la relación de la FK user.id de la tabla transaction.
+-- Para ello debo averiguar el nombre de la FK existente, eliminarla y luego crear una nueva desde transaction hacia data_user 
+SHOW CREATE TABLE data_user;
+#Eliminar la FK data_user_ibfk_1
+SET SQL_SAFE_UPDATES = 0;
+ALTER TABLE data_user DROP FOREIGN KEY data_user_ibfk_1;
+## La borré desde el diagrama E/R y ahora no lo puedo hacer con código.
+
+
+-- Agrego la FK con la dirección correcta
+-- Agregar FK: transaction -> data_user (N a 1)
+ALTER TABLE transaction
+ADD CONSTRAINT fk_transaction_data_user
+FOREIGN KEY (user_id)
+REFERENCES data_user (id);
+
+
+
+
+
+
+##Tabla transaction:
+#Cambiar credit_card_id de NOT NULL a que permita valores nulos y que el tipo de dato sea VARCHAR(15)
+ALTER TABLE transaction CHANGE credit_card_id credit_card_id VARCHAR (15);
+#Visualización
+SHOW COLUMNS 
+FROM transaction;
 
 
 
@@ -324,15 +329,67 @@ alter table transactions.data_user change email personal_email varchar(150);
 
 
 
-#deshabilitar las FK
-set foreign_key_checks=0;
-alter table transactions.credit_card modify id varchar(20);
-#habilitar las FK
-set foreign_key_checks=1;
 
 
 
 
+#Eliminar la Foreign Key fk_transaction_credit_card
+ALTER TABLE transaction DROP FOREIGN KEY fk_transaction_credit_card;
+
+
+
+
+
+
+
+
+
+
+
+##Tabla credit_card:
+#Cambiar el tipo de los siguientes campos:
+-- id a VARCHAR(20) | iban a VARCHAR(50) | pin a VARCHAR(4) | cvv a INT |  expiring_date a VARCHAR (10).
+ALTER TABLE credit_card MODIFY COLUMN id VARCHAR(20);
+ALTER TABLE credit_card MODIFY COLUMN iban VARCHAR(50);
+ALTER TABLE credit_card MODIFY COLUMN pin VARCHAR(4);
+ALTER TABLE credit_card MODIFY COLUMN cvv INT;
+ALTER TABLE credit_card MODIFY COLUMN expiring_date VARCHAR(10);
+#Visualización:
+SHOW COLUMNS 
+FROM credit_card;
+
+
+
+
+
+#Foreign Keys
+-- Agregar FK: transaction -> credit_card (N a 1)
+ALTER TABLE transaction
+ADD CONSTRAINT fk_transaction_credit_card
+FOREIGN KEY (credit_card_id)
+REFERENCES credit_card (id);
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- Cambiar nombre transaction_ibfk_1 a fk_transaction_company
+#Eliminar transaction_ibfk_1
+ALTER TABLE transaction
+DROP FOREIGN KEY transaction_ibfk_1;
+#Crearla nuevamente con el nombre fk_transaction_company
+ALTER TABLE transaction
+ADD CONSTRAINT fk_transaction_company
+FOREIGN KEY (company_id)
+REFERENCES company (id);
 
 
 /*Exercici 2 L'empresa també et sol·licita crear una vista anomenada "InformeTecnico" que contingui la següent informació:
