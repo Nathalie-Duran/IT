@@ -341,6 +341,22 @@ ALTER TABLE user DROP birth_date;
 ALTER TABLE user CHANGE birth_date_temp birth_date DATE NOT NULL;
 
 
+SELECT 
+    table_name,
+    constraint_name
+FROM 
+    information_schema.key_column_usage
+WHERE 
+    referenced_table_name IS NOT NULL
+    AND table_schema = 'Empresa';
+    
+ALTER TABLE empresa.transaction DROP FOREIGN KEY transaction_ibfk_1;
+ALTER TABLE empresa.transaction DROP FOREIGN KEY transaction_ibfk_2;
+ALTER TABLE empresa.transaction DROP FOREIGN KEY transaction_ibfk_3;
+ALTER TABLE empresa.transaction DROP FOREIGN KEY transaction_ibfk_4;
+ALTER TABLE empresa.transaction DROP FOREIGN KEY transaction_ibfk_5;
+ALTER TABLE empresa.transaction DROP FOREIGN KEY transaction_ibfk_6;
+    
 
 
 
@@ -350,6 +366,18 @@ ALTER TABLE user CHANGE birth_date_temp birth_date DATE NOT NULL;
 alter table empresa.transaction add constraint foreign key (user_id) references user(id);
 alter table empresa.transaction add constraint foreign key (credit_card_id) references credit_card(id);
 alter table empresa.transaction add constraint foreign key (company_id) references company(id);
+alter table empresa.transaction add constraint foreign key (order_id) references orders(id);
+
+# Tabla credit_card_rechazada
+ALTER TABLE empresa.credit_cards_rechazada ADD PRIMARY KEY (credit_card_id);
+
+alter table empresa.transaction add constraint foreign key (credit_card_id) references credit_cards_rechazada(credit_card_id);
+
+
+# Como orders_id no es una PK (tiene repeteciones) le cree un idx_id
+
+# Tabla Orders
+ALTER TABLE empresa.orders ADD CONSTRAINT fk_orders_product FOREIGN KEY (product_id) REFERENCES product (id);
 
 
 
