@@ -353,6 +353,33 @@ alter table empresa.transaction add constraint foreign key (company_id) referenc
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # El campo products_id de la tabla transaction contiene los id de los productos con comas en la misma celda
 
 ## Transformación transaction.product_id 
